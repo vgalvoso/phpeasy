@@ -55,14 +55,14 @@ function api($routeName,$api,$data){
     $path = $api;
     if(!is_null($data))
     extract($data);
-    if(!file_exists("api/$path.php")){
-        if(!file_exists("api/$path/index.php")){   
+    if(!file_exists("API/$path.php")){
+        if(!file_exists("API/$path/index.php")){   
             notFound();
         }
         $path = $path."/index";
     }
     
-    include "api/$path.php";
+    include "API/$path.php";
     exit();
 }
 

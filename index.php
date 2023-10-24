@@ -10,6 +10,6 @@
   require_once "Config/Constants.php";
   require_once "Core/Helper.php";
   require_once "Core/Validator.php";
-  require_once "routes/api.php";
-  require_once "routes/web.php";
+  require_once "Routes/api.php";
+  require_once "Routes/web.php";
 ?>
