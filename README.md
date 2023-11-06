@@ -1,2 +1,2 @@
 # PHPEasy
-A procedural PHP framework
+API-centric PHP framework
