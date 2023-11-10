@@ -9,7 +9,6 @@ function validate($inputs, $validations) {
 
     foreach ($validations as $field => $rules) {
         $rules = explode('|', $rules);
-        
         foreach ($rules as $rule) {
             $ruleParts = explode(':', $rule);
             $ruleName = $ruleParts[0];

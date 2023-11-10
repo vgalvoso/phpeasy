@@ -1,10 +1,8 @@
 <?php
-class Sql{
+class DAL{
 
     protected $conn;
-    protected $db;
     public $error;
-    public $query;
     
     /**
      * Connect to database
@@ -53,7 +51,7 @@ class Sql{
      * 
      * @author Van
      * 
-     * @return Object|false  
+     * @return object|false  
      */
     public function getItem($query,$inputs=null){
         try{
@@ -88,7 +86,7 @@ class Sql{
         }
     }
 
-    //insert/update/delete and other queries
+    //insert/update/delete and other none select queries
     public function exec($query,$inputs=null){
         try{
             $stmt = $this->conn->prepare($query);
@@ -98,7 +96,7 @@ class Sql{
             return false;
         }
     }
-    
+
     /**
      * Execute insert statement
      * 
@@ -127,7 +125,7 @@ class Sql{
      * Executes update statement
      * 
      * @param string $table The table to update
-     * @param array $condition Conditions eg. id = :id
+     * @param string $condition Conditions eg. id = :id
      * @param array $values Values to update eg . ["age" => 27]
      * @param array $params Values for conditions eg . ["id" => 1]
      * @return boolean
@@ -145,6 +143,26 @@ class Sql{
             $query = "UPDATE $table SET $refs $condition ;";
            $stmt = $this->conn->prepare($query);
             return $stmt->execute($newParams);
+        }catch(PDOException $e){
+            $this->error = $e;
+            return false;
+        }
+    }
+
+    /**
+     * Executes delete statement
+     * 
+     * @param string $table The table to delete from
+     * @param string $condition Conditions using prepared statement eg. id = :id AND name = :name
+     * @param array $params Values for conditions eg. ["id" => 1,"name" => "Juan Dela Cruz"]
+     * @return boolean
+     */
+    public function delete($table,$condition,$params){
+        try{
+            $condition = empty($condition) ? "" : "WHERE ".$condition;
+            $query = "DELETE FROM $table $condition ;";
+            $stmt = $this->conn->prepare($query);
+            return $stmt->execute($params);
         }catch(PDOException $e){
             $this->error = $e;
             return false;

@@ -73,10 +73,61 @@ const passText = (origin,destination) => {
   let txt =  getHtml(origin)
   setVal(destination,txt)
 }
+
+// const copyToClipboard = (text) => {
+//   navigator.clipboard.writeText(text).then(function() {
+//     alert('Text copied to clipboard');
+//   }).catch(function(err) {
+//     console.error('Failed to copy text: ', err);
+//   });
+// }
+
+// UPDATED CLIPBOARD CODE
 const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text).then(function() {
-    alert('Text copied to clipboard');
-  }).catch(function(err) {
-    console.error('Failed to copy text: ', err);
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert('Text copied to clipboard'))
+      .catch((err) => console.error('Failed to copy text: ', err));
+  } else {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      // For mobile devices
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        alert('Text copied to clipboard');
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    } else {
+      alert('Clipboard not supported on this device');
+    }
+  }
+};
+
+// check if number
+const validateNumberInput = (a) => {
+  a.value = a.value.replace(/[^0-9]/g, '');
+}
+
+
+//HTMX ERROR HANDLER
+const htmxError = (formId,errContainerId) => {
+  getElement(formId).addEventListener('htmx:responseError', function(evt) {
+  getElement(errContainerId).innerHTML = evt.detail.xhr.response
+  });
+}
+
+const htmxSuccess = (formId,customFunction) => {
+  getElement(formId).addEventListener('htmx:afterOnLoad', function(evt) {
+    if(!evt.detail.failed)
+    customFunction()
   });
 }

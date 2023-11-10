@@ -66,16 +66,23 @@ function api($routeName,$api,$data){
     exit();
 }
 
-function post($routeName,$api){
+function post(){
     global $method;
-    if($method != "POST") return;
-    api($routeName,$api,$_POST);
+    if($method != "POST")
+        notFound();
 }
 
-function get($routeName,$api){
+/*function get($routeName,$api){
     global $method;
     if($method != "GET") return;
     api($routeName,$api,$_GET);
+}
+*/
+
+function get(){
+    global $method;
+    if($method != "GET")
+        notFound();
 }
 
 function put($routeName,$api){
@@ -97,44 +104,6 @@ function delete($routeName,$api){
     if($method != "DELETE") return;
     $_DELETE = json_decode(file_get_contents('php://input'),true);
     api($routeName,$api,$_DELETE);
-}
-
-/**
- * Create route for views
- *
- * @param string $routeName Name of the route
- * @param string $view Path to the view file without .php extension
- * @param bool $part Specify if the view is part only (for htmx) or a new page
- * 
- * @return Exit  
- */
-function view($routeName,$view,$part=false){
-    global $path;
-    $temp_path = $path;
-    if(strpos($routeName,"{")){
-        //get param keys
-        $paramKeys = substr($routeName,strpos($routeName,"{")+1);
-        $paramKeys = substr($paramKeys,0,strlen($paramKeys)-1);
-        $paramKeys = explode(",",$paramKeys);
-        $pos = strrpos($routeName,"/");
-        $paramValues = substr($path,$pos+1);
-        $paramValues = explode("/",$paramValues);
-        if(count($paramKeys) != count($paramValues))
-            return;
-        $params = array_combine($paramKeys,$paramValues);
-        extract($params);
-
-        $routeName = substr($routeName,0,strpos($routeName,"{")-1);
-        $temp_path = substr($path,0,strlen($routeName));
-    }
-
-    if($routeName != $temp_path)
-        return;
-    if($part)
-        if(isset($_SERVER["HTTP_SEC_FETCH_MODE"]) && $_SERVER["HTTP_SEC_FETCH_MODE"] == "navigate")
-            notFound();
-    include "View/$view.php";
-    exit();
 }
 
 function cli($routeName,$api){
@@ -254,4 +223,53 @@ function objArrayToValues($objArr,$item){
             array_push($arr, $obj->$item);
         }
     return $arr;
+}
+
+function view(){
+    global $path;
+    
+    if($path == ""){
+        include "View/index.php";
+        exit();        
+    }
+    
+    $checker = substr($path,0,4);
+    if($checker == "api/")
+        return false;
+
+    $rawPath = (strpos($path,"?")) ? strstr($path, '?', true) : $path;
+    if(!file_exists("View/$rawPath.php"))
+        if(!file_exists("View/$rawPath/index.php"))
+            return false;
+        else
+            $rawPath .= "/index";
+
+    if(!empty($_GET))
+        extract($_GET);
+
+    include "View/$rawPath.php";
+    exit();
+}
+
+function component(){
+    if(isset($_SERVER["HTTP_SEC_FETCH_MODE"]) && ($_SERVER["HTTP_SEC_FETCH_MODE"] == "navigate"))
+        notFound();
+}
+
+function newAPI(){
+    if(isset($_SERVER["HTTP_SEC_FETCH_MODE"]) && ($_SERVER["HTTP_SEC_FETCH_MODE"] == "navigate"))
+        notFound();
+    global $path;
+    $rawPath = substr($path,4);
+    if(!file_exists("api/$rawPath.php"))
+        if(!file_exists("api/$rawPath/index.php"))
+            return false;
+        else
+            $rawPath .= "/index";
+
+    if(!empty($_GET))
+        extract($_GET);
+
+    include "api/$rawPath.php";
+    exit();
 }

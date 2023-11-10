@@ -4,7 +4,7 @@ $db = [
         "server" => "localhost",
         "user" => "root",
         "pass" => "",
-        "dbname" => "mydatabase",
+        "dbname" => "phpeasy_db",
         "driver" => "mysql"
     ]
 ];
