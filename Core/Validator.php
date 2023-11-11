@@ -86,3 +86,15 @@ function invalid($message){
     http_response_code(403);
     exit($message);
 }
+
+/**
+ * Place specified inputs from GET/POST to an array
+ */
+function allowedVars($inputs,$rules){
+    $vars = [];
+    foreach($inputs as $key => $val)
+        foreach($rules as $ruleKey => $ruleVal)
+            if($key ==$ruleKey)
+                $vars[$key]=$val;
+    return $vars;
+}

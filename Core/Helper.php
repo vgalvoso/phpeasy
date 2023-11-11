@@ -114,8 +114,26 @@ function cli($routeName,$api){
 }
 
 function to($route){
-    header("Location: $route");
-    exit();
+    $url = BASE_URL.$route;
+
+    $options = [
+        'http' => [
+            'method' => 'GET',
+            // You can add more headers if needed, such as authentication headers
+            'header' => 'Content-type: application/x-www-form-urlencoded',
+        ],
+    ];
+
+    $context = stream_context_create($options);
+    $response = file_get_contents($url, false, $context);
+
+    if ($response === false) {
+        // Handle error
+        echo 'Error fetching data';
+    } else {
+        // Process the response
+        echo $response;
+    }
 }
 
 function notFound(){
@@ -273,3 +291,5 @@ function newAPI(){
     include "api/$rawPath.php";
     exit();
 }
+
+

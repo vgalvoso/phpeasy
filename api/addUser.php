@@ -1,22 +1,21 @@
 <?php
-use Ramsey\Uuid\Uuid;
+post();
 
 $dataRules = ["uname" => "required|string",
     "upass" => "required|string",
-    "fullname" => "required|string"];
+    "firstName" => "required|string",
+    "lastName" => "required|string"];
 validate($_POST,$dataRules);
 
-$post = $_POST;
-$uname = esc($post['uname']);
-$upass = esc($post['upass']);
-$fullname = esc($post['fullname']);
+extract(allowedVars($_POST,$dataRules));
 
 $db = new DAL();
-$values = ["id" => esc(Uuid::uuid4()->toString()),
+$values = ["id" => uniqid(),
     "username" => $uname,
     "userpass" => password_hash($upass,PASSWORD_DEFAULT),
-    "Name" => $fullname];
+    "first_name" => $firstName,
+    "last_name" => $lastName];
 if(!$db->insert("users",$values))
     invalid("Add user failed!");
 
-to("api/getAllUser");
+to("/api/getAllUser");

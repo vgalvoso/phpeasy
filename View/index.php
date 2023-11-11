@@ -11,7 +11,8 @@
 <body>    
     <div class="full-screen col center row">
         <form hx-post="api/addUser" hx-target="#users_tbl" id="add_user_form">
-            <input type="text" name="fullname" id="" placeholder="Full Name">
+            <input type="text" name="firstName" id="" placeholder="First Name">
+            <input type="text" name="lastName" id="" placeholder="Last Name">
             <input type="text" name="uname" id="" placeholder="Username">
             <input type="password" name="upass" id="" placeholder="Password">
             <input type="submit" value="Add User">
@@ -27,7 +28,8 @@
             <thead>
                 <tr>
                     <th>Username</th>
-                    <th>Name</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
                 </tr>
             </thead>
             <tbody id="users_tbl" hx-get="api/getAllUser" hx-trigger="load">
