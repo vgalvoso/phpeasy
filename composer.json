@@ -1,13 +1,5 @@
 {
     "name": "vgalvoso/phpeasy",
-    "description": "PHPEasy A procedural PHP framework",
-    "license": "MIT",
-    "autoload": {
-		"psr-4": {
-			"App\\": "api"
-		}
-	},
-    "require": {
-        "ramsey/uuid": "^4.7"
-    }
+    "description": "PHPEasy an API-centric PHP framework",
+    "license": "MIT"
 }

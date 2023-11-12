@@ -14,105 +14,29 @@ if(isset($_SERVER['REQUEST_URI'])){
 }
 define('PATH',$path);
 define('BASE_URL',getenv('BASE_URL'));
-function api($routeName,$api,$data){
-    global $path;
-    global $method;
-    $route = $routeName;
-    //for request with parameters in uri 
-    //get("api/{param1,param2}","api");
-    if(strpos($routeName,"{")){   
-        //get routeName without parameters 
-        $tempRoute = substr($routeName,0,strpos($routeName,"{")+1);
-        $route = substr($tempRoute,0,strlen($tempRoute)-1);
-        //get param keys
-        $paramKeys = substr($routeName,strpos($routeName,"{")+1);
-        $paramKeys = substr($paramKeys,0,strlen($paramKeys)-1);
-        $paramKeys = explode(",",$paramKeys);
 
-        //check if routename exists in request uri
-        if(str_contains($path,$route)){
-            $pos = strrpos($route,"/");
-            $paramValues = substr($path,$pos+1);
-            $paramValues = explode("/",$paramValues);
-            if(count($paramKeys) != count($paramValues))
-                notFound();
-            $params = array_combine($paramKeys,$paramValues);
-            $path = substr($path,0,strlen($route)-1);
-            $route = substr($tempRoute,0,strlen($tempRoute)-2);
-            extract($params);
-        }
-    }
-
-    //for request with query params
-    $path = strstr($path, "?", true) ?: $path;
-
-    if($route != $path)
-        return;
-    
-    if($method == 'GET')
-        if(isset($_SERVER["HTTP_SEC_FETCH_MODE"]) && ($_SERVER["HTTP_SEC_FETCH_MODE"] == "navigate"))
-        notFound();
-    $path = $api;
-    if(!is_null($data))
-    extract($data);
-    if(!file_exists("API/$path.php")){
-        if(!file_exists("API/$path/index.php")){   
-            notFound();
-        }
-        $path = $path."/index";
-    }
-    
-    include "API/$path.php";
-    exit();
-}
-
+/**
+ * Declare a php file as an HTTP POST endpoint
+ */
 function post(){
     global $method;
     if($method != "POST")
         notFound();
 }
 
-/*function get($routeName,$api){
-    global $method;
-    if($method != "GET") return;
-    api($routeName,$api,$_GET);
-}
-*/
-
+/**
+ * Declare a php file as an HTTP GET endpoint
+ */
 function get(){
     global $method;
     if($method != "GET")
         notFound();
 }
 
-function put($routeName,$api){
-    global $method;
-    if($method != "PUT") return;
-    $_PUT = json_decode(file_get_contents('php://input'),true);
-    api($routeName,$api,$_PUT);
-}
-
-function patch($routeName,$api){
-    global $method;
-    if($method != "PATCH") return;
-    $_PATCH = json_decode(file_get_contents('php://input'),true);
-    api($routeName,$api,$_PATCH);
-}
-
-function delete($routeName,$api){
-    global $method;
-    if($method != "DELETE") return;
-    $_DELETE = json_decode(file_get_contents('php://input'),true);
-    api($routeName,$api,$_DELETE);
-}
-
-function cli($routeName,$api){
-    global $path;
-    if($routeName != $path)
-        return;
-    include "API/$api.php";
-}
-
+/**
+ * Submits a get request and echo its response
+ * @param string $route The GET api route
+ */
 function to($route){
     $url = BASE_URL.$route;
 
@@ -141,6 +65,9 @@ function notFound(){
     exit("URL not found");
 }
 
+/**
+ * Sanitize string for rendering
+ */
 function esc($string){
     return htmlspecialchars($string);
 }
@@ -274,7 +201,7 @@ function component(){
         notFound();
 }
 
-function newAPI(){
+function api(){
     if(isset($_SERVER["HTTP_SEC_FETCH_MODE"]) && ($_SERVER["HTTP_SEC_FETCH_MODE"] == "navigate"))
         notFound();
     global $path;
@@ -291,5 +218,3 @@ function newAPI(){
     include "api/$rawPath.php";
     exit();
 }
-
-

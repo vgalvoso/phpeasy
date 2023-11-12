@@ -13,4 +13,4 @@ require_once "Core/Helper.php";
 require_once "Core/Validator.php";
 
 if(!view())
-    newAPI();
+    api();
