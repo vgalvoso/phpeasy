@@ -6,36 +6,12 @@
     <title>Document</title>
     <link rel="stylesheet" href="public/css/mystyle.css">
     <script src="public/js/htmx.min.js"></script>
-    <script src="public/js/vanscript.js"></script>
 </head>
 <body>    
-    <div class="full-screen col center row">
-        <form hx-post="api/addUser" hx-target="#users_tbl" id="add_user_form">
-            <input type="text" name="firstName" id="" placeholder="First Name">
-            <input type="text" name="lastName" id="" placeholder="Last Name">
-            <input type="text" name="uname" id="" placeholder="Username">
-            <input type="password" name="upass" id="" placeholder="Password">
-            <input type="submit" value="Add User">
-            <span id="error"></span>
-        </form>
-        <script>
-            htmxError('#add_user_form','#error')
-            htmxSuccess('#add_user_form',()=>{
-                setHtml('#error','')
-            })
-        </script>
-        <table>
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                </tr>
-            </thead>
-            <tbody id="users_tbl" hx-get="api/getAllUser" hx-trigger="load">
-                <!-- from GET api/getAllUser -->
-            </tbody>
-        </table>
+    <div class="full-screen col center">
+        <h1 class="text-banner center-text"> PHPEasy </h1>
+        <h1 class="text-header"> Easiest PHP Framework </h1>
+        <button hx-get="admin/subpage">Click</button>
     </div>
 </body>
 </html>

@@ -1,7 +1,8 @@
 <?php
 class Users extends Model{
-    public function getAll(){
-        $sql = "SELECT * FROM users";
-        return $this->db->getItems($sql);
+
+    public function __construct(DAL $db){
+        parent::__construct($db);
+        $this->table = "users";
     }
 }

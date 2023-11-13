@@ -12,10 +12,10 @@ extract(allowedVars($_POST,$dataRules));
 $db = new DAL();
 $values = ["id" => uniqid(),
     "username" => $uname,
-    "userpass" => password_hash($upass,PASSWORD_DEFAULT),
-    "first_name" => $firstName,
-    "last_name" => $lastName];
-if(!$db->insert("users",$values))
+    "password" => password_hash($upass,PASSWORD_BCRYPT,['cost' => 12]),
+    "firstname" => $firstName,
+    "lastname" => $lastName];
+if(!$db->insert('users',$values))
     invalid("Add user failed!");
 
-to("/api/getAllUser");
+//to("/api/getAllUser");
