@@ -189,9 +189,6 @@ function view(){
         else
             $rawPath .= "/index";
 
-    if(!empty($_GET))
-        extract($_GET);
-
     include "View/$rawPath.php";
     exit();
 }

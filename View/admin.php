@@ -8,26 +8,19 @@
     <script src="public/js/htmx.min.js"></script>
     <script src="public/js/vanscript.js"></script>
 </head>
-<body class="full-screen col center">   
-    <form method="post" action="api/addUser">
-        <input type="text" name="firstName" id="" placeholder="First Name">
-        <input type="text" name="lastName" id="" placeholder="Last Name">
-        <input type="text" name="uname" id="" placeholder="Username">
-        <input type="password" name="upass" id="" placeholder="Password">
-        <input type="submit" value="Add User">
-        <span id="error"></span>
-    </form>
-    <table>
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-            </tr>
-        </thead>
-        <tbody id="users_tbl" hx-get="api/getAllUser" hx-trigger="load">
-            <!-- from GET api/getAllUser -->
-        </tbody>
-    </table>
+<body class="full-screen row center">
+    <div class="w-25 h-100 col center">
+        <form>
+            <input type="text" name="firstName" id="" placeholder="First Name">
+            <input type="text" name="lastName" id="" placeholder="Last Name">
+            <input type="text" name="uname" id="" placeholder="Username">
+            <input type="password" name="upass" id="" placeholder="Password">
+            <input type="submit" value="Add User">
+        </form>
+        <button hx-get="admin/users_table" hx-target="#table_container"> Show Table</button>
+    </div>   
+    <div class="w-75  h-100 center" id="table_container">
+
+    </div>
 </body>
 </html>

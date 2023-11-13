@@ -19,6 +19,12 @@
     "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+/*#region DEBUG */
+.debug{
+  border:#0d47a4 2px solid;
+}
+/*#endregion*/
+
 /*#region DEFAULTS */
 *{
   box-sizing:border-box;
@@ -151,42 +157,6 @@ select{
 /*#endregion*/
 
 /*#region Width */
-.w-1{
-  width:8.3%;
-}
-.w-2{
-  width:16.6%;
-}
-.w-3{
-  width:25%;
-}
-.w-4{
-  width:33.3%;
-}
-.w-5{
-  width:41.6%;
-}
-.w-6{
-  width:50%;
-}
-.w-7{
-  width:58.3%;
-}
-.w-8{
-  width:66.6%;
-}
-.w-9{
-  width:75%;
-}
-.w-10{
-  width:83.3%;
-}
-.w-11{
-  width:91.6%;
-}
-.w-12{
-  width:100%;
-}
 .w-100{
   width:100%;
 }
@@ -216,6 +186,9 @@ select{
 }
 .w-20{
   width:20%;
+}
+.w-10{
+  width:10%;
 }
 /*#endregion */
 
