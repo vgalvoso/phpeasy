@@ -7,7 +7,7 @@
             <th>Last Name</th>
         </tr>
     </thead>
-    <tbody id="users_tbl">
+    <tbody id="users_tbl" hx-get="api/getAllUser" hx-trigger="load">
         <tr><td>No Contents</td></tr>
     </tbody>
 </table>

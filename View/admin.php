@@ -19,7 +19,7 @@
         </form>
         <button hx-get="admin/users_table" hx-target="#table_container"> Show Table</button>
     </div>   
-    <div class="w-75  h-100 center" id="table_container">
+    <div class="w-75 h-100 center" id="table_container">
 
     </div>
 </body>
