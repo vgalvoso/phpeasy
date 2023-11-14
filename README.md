@@ -16,6 +16,17 @@ It's goal is to enable php developers to code freely, write less and do more.
 For this document let's assume that the server is hosted in your local machine.
 The base url is http://localhost/phpeasy
 
+And a mysql database named (phpeasy_db)
+
+with 1 table (users)
+
+    id - int(11) auto increment primary,
+    username - varchar(255),
+    password - varchar(255),
+    firstname - varchar(255),
+    lastname - varchar(255)
+
+
 ## Installation
 Manual - Download the repo and paste to htdocs or your webserver's root folder.
 
@@ -45,7 +56,7 @@ Now create View/admin.php and paste the code below
 </head>
 <body class="full-screen row center">
     <div class="w-25 h-100 col center">
-        <form>
+        <form hx-post="api/addUser" h-target="#users_tbl">
             <input type="text" name="firstName" id="" placeholder="First Name">
             <input type="text" name="lastName" id="" placeholder="Last Name">
             <input type="text" name="uname" id="" placeholder="Username">
@@ -91,3 +102,153 @@ Create View/admin/users_table.php and paste the code below
 Now go to http://localhost/phpeasy/admin and click the "Show Table" button.
 
 ## 2. APIs
+Create APIs inside api folder.
+
+API routes will automaticaly created through api folder file structure.
+
+Let's create an api for user creation.
+Create api/addUser.php and paste the code below.
+```php
+<?php
+//Declares that this is a POST endpoint
+post();
+
+//validate request data
+$dataRules = ["uname" => "required|string",
+    "upass" => "required|string",
+    "firstName" => "required|string",
+    "lastName" => "required|string"];
+validate($_POST,$dataRules);
+
+//Filter variables to be included from request data
+extract(allowedVars($_POST,$dataRules));
+
+//Initialize the database 
+$db = new DAL();
+
+//prepare values to insert
+$values = ["username" => $uname,
+    "password" => $upass,
+    "firstname" => $firstName,
+    "lastname" => $lastName];
+
+//Tries to insert value to users table
+if(!$db->insert("users",$values))
+    //return a http 403 response code and stops the script
+    invalid("Can't add new user!");
+
+//Submits a get request to api/getAllUsers
+to("api/getAllUsers");
+```
+the route for this will be http://localhost/phpeasy/api/addUser
+
+API implementation in PHPEasy promotes using guard clauses for more readable and shorter code.
+
+## 3. API Functions
+APIs in PHPEasy encourages a procedural coding style, 
+
+so here are the list of functions that you can use in API implementations:
+
+## 3.1 get()
+Declare a php file as HTTP GET endpoint.
+- Can't be accessed through Sec-Fetch-Mode('navigate')
+- Place it at the top of php file.
+
+Example:
+```php
+<?php
+get();
+```
+
+## 3.2 post()
+Declare a php file as HTTP POST endpoint.
+- Can't be accessed through Sec-Fetch-Mode('navigate')
+- Place it at the top of php file.
+
+Example:
+```php
+<?php
+post();
+```
+
+## 3.3 validate($inputs,$validations)
+Validate a key-value pair array based on validation rules.
+- Returns true if valid, Echo errors if invalid and exits the script.
+- Use it to validate request data ($_GET,$_POST).
+- `$inputs` - Associative array to be validated.
+- `$validations` - Associative array containing keys that matched keys in $data and values are the validation rules.
+
+Example:
+
+api/addUser.php
+```php
+<?php
+post();
+//Form data from View/admin.php
+$dataRules = ["uname" => "required|string",
+    "upass" => "required|string",
+    "firstName" => "required|string",
+    "lastName" => "required|string"];
+validate($_POST,$dataRules);
+```
+
+## 3.4 allowedVars($inputs,$rules)
+Filter an associative array based on $rules(same as $dataRules in validate()) and place it in 1 array.
+- returns - Associative Array
+- `$inputs` - Associative array to filter ($_GET/$_POST)
+- `$rules` - Associative array
+
+## 3.5 invalid($message)
+Return HTTP 403 response code, message and exits the script.
+- `$message` - String for response
+
+## 3.6 to($getEndpoint)
+Submits a GET request and echo its response
+- `$getEndpoint` - GET API endpoint
+
+## 3.7 esc($string)
+Shorter syntax for htmlspecialchars()
+- `$string` - String to sanitize
+- Use it for echoing HTML sanitazion.
+
+## 3.8 output($content,$contentType = 'application/json')
+Set content type, output the content and exit script
+- `$content` - String to output
+- `$contentType` - Sets content-type header defaults application/json
+
+## 3.9 generateCode($length = 6)
+Generate a randomized alphanumeric code
+- `$length` - Length of code to be generated (default 6)
+
+## 3.10 objectToSession($object)
+Extract object keys and values and store to session array
+- `$object` - The object to extract
+Example:
+
+```php
+<?php
+$db = new DAL();
+$user = new User($db);
+
+if(!$userInfo = $user->getDetails($userId))
+    invalid("User does not exist!");
+
+objToSession($userInfo);
+```
+
+## 3.11 uploadFile($uploadFile,$uploadPath)
+
+## 3.12 session($sessionVar,$value = null)
+Get/Set a session variable
+- `$sessionVar` - Session Key
+- `$value` - Sets a session value if null
+
+## 3.13 objArrayToValues($objArr,$item)
+Convert an array of objects to indexed array containing values of specified item.
+- `$objArr` - Array if ibjects to convert
+- `$item` - object item to extract
+
+## 3.14 invalid($message)
+Returns a 403 HTTP response code, outputs `$message` and exit the script.
+
+## 4. Database Abstraction Layer

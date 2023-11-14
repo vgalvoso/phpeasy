@@ -107,7 +107,7 @@ function generateCode($length = 6) {
  * Extract object keys and values and store to session array
  * @param object $object The object to extract
  */
-function objectToSession($object){
+function objToSession($object){
     // Extract keys and values from object
     $objectVars = get_object_vars($object);
 
