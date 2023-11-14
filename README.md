@@ -237,6 +237,10 @@ objToSession($userInfo);
 ```
 
 ## 3.11 uploadFile($uploadFile,$uploadPath)
+Generate new file name and upload the file
+ - `string $uploadFile` $_FILE key
+ * `string $uploadPath` Location for upload file must add "/" to the end
+ * returns boolean|string New file name if successful, false otherwise
 
 ## 3.12 session($sessionVar,$value = null)
 Get/Set a session variable
@@ -251,4 +255,61 @@ Convert an array of objects to indexed array containing values of specified item
 ## 3.14 invalid($message)
 Returns a 403 HTTP response code, outputs `$message` and exit the script.
 
-## 4. Database Abstraction Layer
+## 4. Working with database
+PHPEasy introduces DAL() class for database operations.
+Supports MYSql, MSSql and SQLite.
+
+Set database configurations in Config/Database.php
+
+Below are DAL() functions
+
+## 4.1 Initialize
+```php
+$db = new DAL();
+```
+
+## 4.2 insert
+Executes an INSERT statement;
+- `$table` - The table name to be inserted
+- `$values` - Associative array containing keys that match table fields and the values to insert.
+- returns boolean
+
+Example:
+```php
+$values = ["username" => $uname,
+    "password" => $upass,
+    "firstname" => $firstName,
+    "lastname" => $lastName];
+$db->insert("users",$values);
+```
+
+## 4.3 update
+Executes update statement
+- `string $table` The table to update
+- `string $condition` Conditions eg. id = :id
+- `array $values` Associative array containing values to update eg .`["age" => 27]`
+- `array $params` Values for conditions eg . ["id" => 1]
+- return boolean
+
+Example:
+```php
+$values = [
+    "firstname" => $firstName,
+    "lastname" => $lastName];
+$params = ["id" => 1];
+
+$db->update("users","id=:id",$values,$params);
+```
+
+## 4.4 delete
+## 4.5 getItems
+## 4.6 getItem
+## 4.7 startTrans
+## 4.8 commit
+## 4.9 rollback
+## 4.10 getError
+## 4.11 lastId
+## 4.12 getDriver
+
+# 5. Model
+Create models inside Models folder
