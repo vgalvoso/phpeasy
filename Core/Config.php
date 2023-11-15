@@ -5,4 +5,5 @@
 //Set Default Timezone0
 date_default_timezone_set("Asia/Manila");
 
-//
+//CONSTANTS
+define('CURRENT_DATETIME',date("Y-m-d H:i:s"));
