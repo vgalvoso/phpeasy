@@ -8,9 +8,27 @@ It's goal is to enable php developers to code freely, write less and do more.
 3. Made for HTMX
 4. Simple Database Abstraction Layer
 5. Helper Functions such as input validator, code generator, upload file, etc.
-6. Procedural and OOP hybrid coding
+6. Promotes procedural and OOP hybrid coding
 7. Supports PHP 8 and above , MySQL, MSSQL and SQlite
 8. Includes basic css and js helpers.
+
+## Table of Contents
+I. [Intro]
+
+II. [Installation]
+1. [Views]
+2. [APIs]
+3. [API Functions]
+4. [Working with Database]
+5. [Model]
+
+[Intro]: #intro
+[Installation]: #installation
+[Views]: #1-views
+[APIs]: #2-apis
+[API Functions]: #3-api-functions
+[Working with Database]: #4-working-with-database
+[Model]: #5-model
 
 ## Intro
 For this document let's assume that the server is hosted in your local machine.
@@ -298,18 +316,119 @@ $values = [
     "lastname" => $lastName];
 $params = ["id" => 1];
 
+$db = new DAL();
+
 $db->update("users","id=:id",$values,$params);
 ```
 
 ## 4.4 delete
+Executes delete statement
+- `string $table` The table to delete from
+- `string $condition` Conditions using prepared statement eg. id = :id AND name = :name
+- `array $params` Values for conditions eg. ["id" => 1,"name" => "Juan Dela Cruz"]
+- return boolean
+
+Example:
+```php
+$delete("users","id=:id",["id" => 1]);
+```
+
 ## 4.5 getItems
+Select multiple items
+- `string $query` Select statement
+- `array $inputs` Parameters for prepared statement default(null)
+- return array|false
+
+Example:
+```php
+$db = new DAL();
+
+$sql = "SELECT * FROM users WHERE lastname = :surname";
+$params = ["surname" => $lastName];
+
+$users = $db->getItems($sql,$params);
+```
 ## 4.6 getItem
-## 4.7 startTrans
-## 4.8 commit
-## 4.9 rollback
-## 4.10 getError
-## 4.11 lastId
-## 4.12 getDriver
+Select single row query
+- `string $query` Select statement
+- `array $inputs` Parameters for prepared statement default(null)
+- return object|false
+
+Example:
+```php
+$db = new DAL();
+
+$sql = "SELECT * FROM users WHERE id=:userId";
+$params = ["userId" => 1];
+
+$users = $db->getItem($sql,$params);
+```
+
+## 4.7 startTrans()
+Start a database transaction.
+
+## 4.8 commit()
+Commit database transaction.
+- Place this before returning a response in api.
+
+## 4.9 rollback()
+Rollback database transaction.
+- Rarely used because when you exit the script without calling commit(), 
+- rollback() will be automatically executed.
+
+## 4.10 getError()
+Returns Database Errors
+- A very useful debugging tool.
+
+## 4.11 lastId($field=null)
+Get lastId inserted to database
+- `string $field` Specify a lastId field, default null
+
+## 4.12 getDriver()
+Get the database friver that is currently used.
 
 # 5. Model
 Create models inside Models folder
+
+PHPEasy utilizes dependency injection to avoid too much object creation.
+
+Models can be accessed in APIs and even on views,
+no need to declare namespaces or `use` keyword.
+
+Example:
+
+ - Models/Users.php
+```php
+<?php
+class Users extends Model{
+
+    private $table = "users";
+
+    public function add($values){
+        return $this->db->insert($this->table,$values);
+    }
+
+    public function getAll(){
+        $sql = "SELECT * FROM $this->table;";
+        return $this->db->getItems($sql);
+    }
+}
+
+```
+ - api/getAllUser.php
+```php
+<?php
+$db = new DAL();
+$users = new Users($db);
+
+$usersList = $users->getAll();
+```
+
+You can use models or not depending on project requirements.
+
+DAL class is accessible directly in api files, you can execute a query directly on api implementation without creating a Model.
+
+## 6. Extras
+See 
+- js helpers: public/js/vanscript.js
+- css: public/css/mystyle.css
