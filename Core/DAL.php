@@ -17,15 +17,12 @@ class DAL{
      * 
      * @author Van
      */
-    public function __construct($dbase="default",$server="",$user="",$pass="",$dbname="",$driver=""){
-        require "Config/Database.php";
-        if($dbase != null){
-            $server = $db[$dbase]["server"];
-            $user = $db[$dbase]["user"];
-            $pass = $db[$dbase]["pass"];
-            $dbname = $db[$dbase]["dbname"];
-            $driver = $db[$dbase]["driver"];
-        }
+    public function __construct($config=[]){
+        $server = getenv('DB_HOST');
+        $user = getenv('DB_USER');
+        $pass = getenv('DB_PASS');
+        $dbname = getenv('DB_NAME');
+        $driver = getenv('DB_DRIVER');
         try{
             $this->conn = new PDO("$driver:host=$server;dbname=$dbname;",$user,$pass,
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);

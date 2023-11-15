@@ -1,26 +1,45 @@
 <?php
-(new DotEnv(BASE_DIR . '/.env'))->load();
-$path = "";
-if(isset($_SERVER['REQUEST_URI'])){
-	$path = $_SERVER['REQUEST_URI'];
-    //get $path except first "/"
-    $path = substr($path, 1);
-    //remove string from start to second "/"
-    if(getenv('APP_ENV') == "development")
-        $path = substr($path, strpos($path, "/") + 1);
-    $method = $_SERVER['REQUEST_METHOD'];
-}else{
-	$path = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : '';
+readDotEnv();
+init();
+function readDotEnv(){
+    $envPath = BASE_DIR.'/.env';
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0)
+            continue;
+
+        list($name, $value) = explode('=', $line, 2);
+        $name = trim($name);
+        $value = trim($value);
+
+        if (!array_key_exists($name, $_ENV)) {
+            putenv(sprintf('%s=%s', $name, $value));
+            $_ENV[$name] = $value;
+        }
+    }
 }
-define('PATH',$path);
-define('BASE_URL',getenv('BASE_URL'));
+function init(){
+    if(isset($_SERVER['REQUEST_URI'])){
+        $path = $_SERVER['REQUEST_URI'];
+        //get $path except first "/"
+        $path = substr($path, 1);
+        //remove string from start to second "/"
+        if(getenv('APP_ENV') == "development")
+            $path = substr($path, strpos($path, "/") + 1);
+        $method = $_SERVER['REQUEST_METHOD'];
+    }else{
+        $path = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : '';
+    }
+    define('PATH',$path);
+    define('REQUEST_METHOD',$method);
+    define('BASE_URL',getenv('BASE_URL'));    
+}
 
 /**
  * Declare a php file as an HTTP POST endpoint
  */
 function post(){
-    global $method;
-    if($method != "POST")
+    if(REQUEST_METHOD != "POST")
         notFound();
 }
 
@@ -28,8 +47,7 @@ function post(){
  * Declare a php file as an HTTP GET endpoint
  */
 function get(){
-    global $method;
-    if($method != "GET")
+    if(REQUEST_METHOD != "GET")
         notFound();
 }
 
@@ -43,7 +61,6 @@ function to($route){
     $options = [
         'http' => [
             'method' => 'GET',
-            // You can add more headers if needed, such as authentication headers
             'header' => 'Content-type: application/x-www-form-urlencoded',
         ],
     ];
@@ -126,26 +143,21 @@ function objToSession($object){
 function uploadFile($uploadFile,$uploadPath){
     if(!isset($_FILES[$uploadFile]))
         return false;
+    
     $file = $_FILES[$uploadFile];
 
-    // File properties
-    $file_name = $file['name'];
-    $file_tmp = $file['tmp_name'];
-    $file_size = $file['size'];
-    $file_error = $file['error'];
-
     // Check for errors
-    if($file_error !== 0)
+    if($file['error'] !== 0)
         return false;
 
     // Generate a unique file name
-    $new_file_name = uniqid() . '_' . $file_name;
+    $new_file_name = uniqid() . '_' . $file['name'];
         
     // Upload directory
     $uploadPath = $uploadPath . $new_file_name;
         
     // Move uploaded file to the destination
-    if (!move_uploaded_file($file_tmp, $uploadPath))
+    if (!move_uploaded_file($file['tmp_name'], $uploadPath))
         return false;
     return $new_file_name;
 }
@@ -171,18 +183,16 @@ function objArrayToValues($objArr,$item){
 }
 
 function view(){
-    global $path;
-    
-    if($path == ""){
+    if(PATH == ""){
         include "View/index.php";
         exit();        
     }
     
-    $checker = substr($path,0,4);
+    $checker = substr(PATH,0,4);
     if($checker == "api/")
         return false;
 
-    $rawPath = (strpos($path,"?")) ? strstr($path, '?', true) : $path;
+    $rawPath = (strpos(PATH,"?")) ? strstr(PATH, '?', true) : PATH;
     if(!file_exists("View/$rawPath.php"))
         if(!file_exists("View/$rawPath/index.php"))
             return false;
@@ -201,8 +211,7 @@ function component(){
 function api(){
     if(isset($_SERVER["HTTP_SEC_FETCH_MODE"]) && ($_SERVER["HTTP_SEC_FETCH_MODE"] == "navigate"))
         notFound();
-    global $path;
-    $rawPath = substr($path,4);
+    $rawPath = substr(PATH,4);
     if(!file_exists("api/$rawPath.php"))
         if(!file_exists("api/$rawPath/index.php"))
             return false;
