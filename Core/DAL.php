@@ -7,17 +7,9 @@ class DAL{
     /**
      * Connect to database
      *
-     * @param string $dbase Database credentials set in connect.php
-     * Below here for custom connection(not set in connect.php)
-     * @param string $server Database server ip  
-     * @param string $user Database username  
-     * @param string $pass Database password  
-     * @param string $dbname Database name  
-     * @param string $driver Database driver(mysql,mssql)  
-     * 
      * @author Van
      */
-    public function __construct($config=[]){
+    public function __construct(){
         $server = getenv('DB_HOST');
         $user = getenv('DB_USER');
         $pass = getenv('DB_PASS');
@@ -101,6 +93,35 @@ class DAL{
      * @param array $values Array of values to insert eg. ["fName" => "Eren","lName" => "Jaeger"]
      */
     public function insert($table,$values){
+        try{
+            $keys = array_keys($values);
+            $newKeys = [];
+            foreach($keys as $key){
+                array_push($newKeys,":$key");
+            }
+            $refs = implode(",",$newKeys);
+            $fields = implode(",",$keys);
+            $query = "INSERT INTO $table($fields) VALUES($refs);";
+           $stmt = $this->conn->prepare($query);
+            return $stmt->execute($values);
+        }catch(PDOException $e){
+            $this->error = $e;
+            return false;
+        }
+    }
+    
+    /**
+     * Execute insert statement with multiple values
+     * 
+     * @param string $table Table name to insert into
+     * @param array $values Array of values to insert eg. 
+     *          [
+     *              ["fName" => "Eren","lName" => "Jaeger"],
+     *              ["fName" => "Mikasa","lName" => "Ackerman"],
+     *              ["fName" => "Armin","lName" => "Arlert"],
+     *          ]
+     */
+    public function insertMulti($table,$values){
         try{
             $keys = array_keys($values);
             $newKeys = [];
