@@ -17,4 +17,12 @@ class Model{
         return $this->db->insert($this->table,$values);
     }
 
+    public function get($id){
+        $sql = "SELECT * FROM $this->table WHERE id=:id";
+        return $this->db->getItem($sql,["id" => $id]);
+    }
+
+    public function delete($id){
+        return $this->db->delete($this->table,"id=:id",["id"=>$id]);
+    }
 }

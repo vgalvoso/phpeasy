@@ -39,6 +39,10 @@ function init(){
  * Declare a php file as an HTTP POST endpoint
  */
 function post(){
+    if(isset($_SESSION["in_script"]) && session("in_script")){
+        session("in_script",false);
+        return true;
+    }
     if(REQUEST_METHOD != "POST")
         notFound();
 }
@@ -47,39 +51,45 @@ function post(){
  * Declare a php file as an HTTP GET endpoint
  */
 function get(){
+    if(isset($_SESSION["in_script"]) && session("in_script")){
+        session("in_script",false);
+        return true;
+    }
     if(REQUEST_METHOD != "GET")
         notFound();
 }
 
 /**
- * Submits a get request and echo its response
- * @param string $route The GET api route
+ * Include specified view or api
  */
-function to($route){
-    $url = BASE_URL.$route;
+function to($route,$in_script=true){
+    if(file_exists($route.".php"))
+        include $route.".php";
+    else
+        include $route."/index.php";
+    if($in_script)
+        session("in_script",true);
+    die;
+}
 
-    $options = [
-        'http' => [
-            'method' => 'GET',
-            'header' => 'Content-type: application/x-www-form-urlencoded',
-        ],
-    ];
+/**
+ * Extract object keys and values and store to session array
+ * @param object $object The object to extract
+ */
+function objectToSession($object){
+    // Extract keys and values from object
+    $objectVars = get_object_vars($object);
 
-    $context = stream_context_create($options);
-    $response = file_get_contents($url, false, $context);
-
-    if ($response === false) {
-        // Handle error
-        echo 'Error fetching data';
-    } else {
-        // Process the response
-        echo $response;
+    // Store keys and values as separate session variables
+    foreach ($objectVars as $key => $value) {
+        $_SESSION[$key] = $value;
+        setcookie($key, $value, time() + 3600, '/');
     }
 }
 
 function notFound(){
     header("HTTP/1.1 404 Not Found");
-    exit("URL not found");
+    die("URL not found");
 }
 
 /**
@@ -99,7 +109,7 @@ function output($content,$contentType = 'application/json'){
     $data = match ($contentType) {
         "application/json" => json_encode($content)
     };
-    exit($data);
+    die($data);
 }
 
 /**
@@ -110,7 +120,7 @@ function output($content,$contentType = 'application/json'){
  * @return string
  */
 function generateCode($length = 6) {
-    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     $code = '';
   
     for ($i = 0; $i < $length; $i++) {
@@ -185,7 +195,7 @@ function objArrayToValues($objArr,$item){
 function view(){
     if(PATH == ""){
         include "View/index.php";
-        exit();        
+        die();        
     }
     
     $checker = substr(PATH,0,4);
@@ -200,7 +210,7 @@ function view(){
             $rawPath .= "/index";
 
     include "View/$rawPath.php";
-    exit();
+    die;
 }
 
 function component(){
@@ -222,5 +232,5 @@ function api(){
         extract($_GET);
 
     include "api/$rawPath.php";
-    exit();
+    die;
 }

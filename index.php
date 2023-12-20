@@ -1,4 +1,5 @@
 <?php
+session_start();
 define('BASE_DIR',__DIR__);
 require_once "Core/Config.php";
 require_once "Core/Helper.php";
