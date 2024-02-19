@@ -1,4 +1,11 @@
 <?php
+
+namespace Core;
+
+use PDO;
+use PDOException;
+use function Core\Helper\output;
+
 class DAL{
 
     protected $conn;
@@ -9,15 +16,29 @@ class DAL{
      *
      * @author Van
      */
-    public function __construct(){
-        $server = getenv('DB_HOST');
-        $user = getenv('DB_USER');
-        $pass = getenv('DB_PASS');
-        $dbname = getenv('DB_NAME');
-        $driver = getenv('DB_DRIVER');
+    public function __construct($dbase = "default"){
+        require "Database.php";
+        $database = $db[$dbase] ?? null;
+        if($database == null){
+            $data = ["status"=>"Failed","message"=>"Database config [$dbase] not found"];
+            output($data);
+        }
+        $server = $db[$dbase]["server"];
+        $user = $db[$dbase]["user"];
+        $pass = $db[$dbase]["pass"];
+        $dbname = $db[$dbase]["dbname"];
+        $driver = $db[$dbase]["driver"];
+        $charset = $db[$dbase]["charset"];
+
         try{
-            $this->conn = new PDO("$driver:host=$server;dbname=$dbname;",$user,$pass,
+            if($driver=="sqlsrv"){
+            $this->conn = new PDO("$driver:Server=$server;database=$dbname;Encrypt=true;TrustServerCertificate=true;",$user,$pass,
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            }
+            if($driver=="mysql"){
+                $this->conn = new PDO("$driver:host=$server;dbname=$dbname;charset=$charset",$user,$pass,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            }
         }catch(PDOException $e){
             exit($this->error = $e);
         }

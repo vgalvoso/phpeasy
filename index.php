@@ -1,11 +1,12 @@
 <?php
-session_start();
+
 define('BASE_DIR',__DIR__);
-require_once "Core/Config.php";
-require_once "Core/Helper.php";
-require_once "Core/Validator.php";
-@$file = include "vendor/autoload.php";
-require_once "autoload.php";
+
+include "vendor/autoload.php";
+
+use function Core\Helper\api;
+use function Core\Helper\view;
+
 
 if(!view())
     api();

@@ -1,8 +1,15 @@
 <?php
+
+namespace Core\Validator;
+
+use function Core\Helper\response;
+
 /**
- * if not valid, echo errors and exit script, return true if valid
+ * Validate inputs, return true if valid, 
+ * exit and return 400 status code and error details if not
  * @param array $inputs Array of variables to be validated
  * @param array $validations Array of validation rules
+ * @return boolean
  */
 function validate($inputs, $validations) {
     $errors = [];
@@ -66,35 +73,12 @@ function validate($inputs, $validations) {
     }
     if (!empty($errors)) {
         // Handle validation errors
-        http_response_code(403);
-        foreach ($errors as $field => $fieldErrors) {
-            foreach ($fieldErrors as $error) {
-                echo "<p>$error</p><br>";
-            }
-        }
+        $data = [
+            "status" => "Failed",
+            "error(s):" => array_reduce($errors,'array_merge',[])
+        ];
+        response($data,400);
         exit();
     }
     return true;
-    //return $errors;
-}
-
-/**
- * Return 403 response code to mark as invalid
- * @param string $message Error message to show
- */
-function invalid($message){
-    http_response_code(403);
-    exit($message);
-}
-
-/**
- * Place specified inputs from GET/POST to an array
- */
-function allowedVars($inputs,$rules){
-    $vars = [];
-    foreach($inputs as $key => $val)
-        foreach($rules as $ruleKey => $ruleVal)
-            if($key ==$ruleKey)
-                $vars[$key]=$val;
-    return $vars;
 }

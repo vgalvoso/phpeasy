@@ -12,6 +12,9 @@ It's goal is to enable php developers to code freely, write less and do more.
 7. Supports PHP 8 and above , MySQL, MSSQL and SQlite
 8. Includes basic css and js helpers.
 
+## Main Points
+1. Use of Data Abstraction Layer rather than ORM, focused on maximum performance without large database calls used by orms.
+
 ## Table of Contents
 I. [Intro]
 
@@ -31,26 +34,37 @@ II. [Installation]
 [Model]: #5-model
 
 ## Intro
-For this document let's assume that the server is hosted in your local machine.
-The base url is http://localhost/phpeasy
+Nowadays you must follow coding standards(OOP,SOLID,DRY,etc.) and mvc frameworks to do web development
+using PHP. PHP frameworks out there comes with too much files, configurations, classes and dependencies.
+I made this mini framework so php developers can do web development faster while mastering and enjoying 
+the PHP language itself (Yes! no need to learn libraries a,b,c...).
 
-And a mysql database named (phpeasy_db)
-
+## Pre-requisites
+Hands-on is the best way to learn, so let's get started.
+1. You must have php web server installed and setup like(XAMPP).
+2. You must have composer installed.
+3. Create the sample database
+Execute this MySQL query to create phpeasy_db
 with 1 table (users)
 
-    id - int(11) auto increment primary,
-    username - varchar(255),
-    password - varchar(255),
-    firstname - varchar(255),
-    lastname - varchar(255)
+```SQL
+CREATE DATABASE IF NOT EXISTS phpeasy_db;
 
+USE phpeasy_db;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255),
+    password VARCHAR(255),
+    firstname VARCHAR(255),
+    lastname VARCHAR(255)
+);
+```
 
 ## Installation
-Manual - Download the repo and paste to htdocs or your webserver's root folder.
-
 Composer - open a terminal inside htdocs folder and execute the command below.
 ```
-composer create-project vgalvoso/phpeasy
+composer create-project vgalvoso/phpeasy my_phpeasy
 ```
 
 ## 1. Views

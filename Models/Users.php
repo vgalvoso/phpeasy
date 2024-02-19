@@ -1,4 +1,10 @@
 <?php
+
+namespace Models;
+
+use Core\DAL;
+use Models\Model;
+
 class Users extends Model{
 
     public function __construct(DAL $db){
@@ -6,3 +12,5 @@ class Users extends Model{
         $this->table = "users";
     }
 }
+
+//EOF

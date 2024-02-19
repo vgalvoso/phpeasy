@@ -1,5 +1,16 @@
 {
     "name": "vgalvoso/phpeasy",
     "description": "PHPEasy an API-centric PHP framework",
-    "license": "MIT"
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Core\\": "Core/",
+            "Models\\": "Models/"
+        },
+        "files":[
+            "Core/Helper.php",
+            "Core/Validator.php",
+            "Core/Config.php"
+        ]
+    }
 }
