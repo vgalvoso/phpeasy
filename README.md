@@ -1,122 +1,90 @@
 # Welcome to PHPEasy
-PHPEasy is a monolithic API-centric php framework.
-It's goal is to enable php developers to code freely, write less and do more.
+PHPEasy is an API-centric PHP framework. Code as close to PHP language itself rather than a framework.
+
 
 ## Features
-1. Monolithic API-centric architecture (non-MVC framework)
-2. File-based routing
-3. Made for HTMX
-4. Simple Database Abstraction Layer
-5. Helper Functions such as input validator, code generator, upload file, etc.
-6. Promotes procedural and OOP hybrid coding
-7. Supports PHP 8 and above , MySQL, MSSQL and SQlite
-8. Includes basic css and js helpers.
+1. REST API development
+2. Full-stack web app development
+3. File-based routing
+4. Lightweight, no too much dependencies and configurations
+5. Simple Database Abstraction Layer
+6. Helper Functions such as input validator, code generator, upload file, etc.
+7. Promotes ubt not limitted to procedural programming
+8. Supports PHP 8 and above , MySQL, MSSQL and SQlite
+9. Includes basic css(mystyle.css) and js(vanscript.js) utility library.
 
 ## Main Points
-1. Use of Data Abstraction Layer rather than ORM, focused on maximum performance without large database calls used by orms.
+1. Promotes to master the PHP language itself rather than a framework.
+2. Direct to the point coding, no too much abstractions.
+3. Use of Data Abstraction Layer rather than ORM, focused on maximum performance without large database calls used by orms.
 
 ## Table of Contents
 I. [Intro]
 
-II. [Installation]
+II. [Pre-requisites]
+
+III. [Installation]
 1. [Views]
 2. [APIs]
 3. [API Functions]
 4. [Working with Database]
-5. [Model]
+5. [Progressive]
+6. [Extra]
 
 [Intro]: #intro
+[Pre-requisites]: #pre-requisites
 [Installation]: #installation
 [Views]: #1-views
 [APIs]: #2-apis
 [API Functions]: #3-api-functions
 [Working with Database]: #4-working-with-database
-[Model]: #5-model
+[Progressive]: #5-progressive
+[Extra]: #6-extras
 
 ## Intro
+This is for someone who loves Vanilla PHP and its simplicity.
 Nowadays you must follow coding standards(OOP,SOLID,DRY,etc.) and mvc frameworks to do web development
 using PHP. PHP frameworks out there comes with too much files, configurations, classes and dependencies.
 I made this mini framework so php developers can do web development faster while mastering and enjoying 
-the PHP language itself (Yes! no need to learn libraries a,b,c...).
+the PHP language itself (Yes! no need to learn so many libraries).
 
 ## Pre-requisites
-Hands-on is the best way to learn, so let's get started.
-1. You must have php web server installed and setup like(XAMPP).
-2. You must have composer installed.
-3. Create the sample database
-Execute this MySQL query to create phpeasy_db
-with 1 table (users)
-
-```SQL
-CREATE DATABASE IF NOT EXISTS phpeasy_db;
-
-USE phpeasy_db;
-
-CREATE TABLE IF NOT EXISTS users (
-    id INT(11) AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255),
-    password VARCHAR(255),
-    firstname VARCHAR(255),
-    lastname VARCHAR(255)
-);
-```
+1. PHP 8^.
+2. Composer.
 
 ## Installation
-Composer - open a terminal inside htdocs folder and execute the command below.
+Composer - open a terminal inside your root or htdocs folder and execute the command below.
 ```
 composer create-project vgalvoso/phpeasy my_phpeasy
 ```
+you can change [my_phpeasy] to any project name you want.
+
+Now open your browser and go to http://localhost/my_phpeasy
 
 ## 1. Views
 Create views inside View folder.
 
 View routes will be automatically created based on View folder structure.
-The index.php inside View folder is the entry point,
-so route will be http://localhost/phpeasy.
 
-Now create View/admin.php and paste the code below
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="public/css/mystyle.css">
-    <script src="public/js/htmx.min.js"></script>
-    <script src="public/js/vanscript.js"></script>
-</head>
-<body class="full-screen row center">
-    <div class="w-25 h-100 col center">
-        <form hx-post="api/addUser" h-target="#users_tbl">
-            <input type="text" name="firstName" id="" placeholder="First Name">
-            <input type="text" name="lastName" id="" placeholder="Last Name">
-            <input type="text" name="uname" id="" placeholder="Username">
-            <input type="password" name="upass" id="" placeholder="Password">
-            <input type="submit" value="Add User">
-        </form>
-        <button hx-get="admin/users_table" hx-target="#table_container"> Show Table</button>
-    </div>   
-    <div class="w-75  h-100 center" id="table_container">
+Look at examples below.
+1. View file path: [View/admin/dashboard.php], the route: ["admin/dashboard"].
+2. View file path: [View/login.php], the route: ["login"].
 
-    </div>
-</body>
-</html>
-```
-the route will be http://localhost/phpeasy/admin
+You can ommit the file name if the view file is named [index.php]:
+1. View file path: [View/index.php], the route: [""].
+2. View file path: [VIew/admin/index.php], the route: ["admin"].
 
 
 ## 1.1 View components
-(SPA)Single Page Applications are composed of view components,
-view components are accessible only through ajax requests.
+(SPA)Single Page Applications are composed of view components.
 
-In PHPEasy just call component(); at the top of view file to specify it as a view component.
+View components are accessible only through ajax requests.
 
-To organize views create a subdirectory and place view components inside.
+Just call Core/Helper/component(); at the top of view file to specify it as a view component.
 
-Create View/admin/users_table.php and paste the code below
+Example: View/admin/users_table.php
 ```html
-<?= component(); ?>
+<?= Core/Helper/component(); ?>
 <table>
     <thead>
         <tr>
@@ -131,161 +99,228 @@ Create View/admin/users_table.php and paste the code below
 </table>
 ```
 
-Now go to http://localhost/phpeasy/admin and click the "Show Table" button.
-
 ## 2. APIs
-Create APIs inside api folder.
+PHPEasy supports REST API.
 
-API routes will automaticaly created through api folder file structure.
+All APIs are placed inside api folder.
 
-Let's create an api for user creation.
-Create api/addUser.php and paste the code below.
+API routes will automaticaly created through api folder file structure and implemented functions inside the php file named with http verbs e.g.(get(),post(),patch()).
+
+So for example you omitted the delete() function, you can't call DELETE api/users/{id}.
+
+Here is an example of a Users REST API.
+
+API file path: [api/users.php]
+
+Routes:
+1. GET api/users - Get all users
+2. GET api/users/{id} - Get user by id
+3. POST api/users - Create new user
+4. DELETE api/users/{id} - Delete a user
+5. PUT api/users/{id} - Replace user
+6. PATCH api/users/{id} - Update a user
 ```php
 <?php
-//Declares that this is a POST endpoint
-post();
 
-//validate request data
-$dataRules = ["uname" => "required|string",
-    "upass" => "required|string",
-    "firstName" => "required|string",
-    "lastName" => "required|string"];
-validate($_POST,$dataRules);
+use Core\DAL;
 
-//Filter variables to be included from request data
-extract(allowedVars($_POST,$dataRules));
+use function Core\Helper\error;
+use function Core\Helper\getRequestBody;
+use function Core\Helper\response;
+use function Core\Helper\startAPI;
 
-//Initialize the database 
-$db = new DAL();
+startAPI();
 
-//prepare values to insert
-$values = ["username" => $uname,
-    "password" => $upass,
-    "firstname" => $firstName,
-    "lastname" => $lastName];
+function get(){
+    $db = new DAL();
+    //GET user by id
+    if(defined('URI_PARAM')){
+        $query = "SELECT * FROM users WHERE id = :id";
+        $param = ["id" => URI_PARAM];
+        if(!$user = $db->getItem($query,$param))
+            response([]);
+        response([$user]);
+    }
+    //GET All users
+    $query = "SELECT * FROM users";
+    $users = $db->getItems($query);
+    response($users);
+}
 
-//Tries to insert value to users table
-if(!$db->insert("users",$values))
-    //return a http 403 response code and stops the script
-    invalid("Can't add new user!");
+function post(){
+    $db = new DAL();
+    $rq = (object)getRequestBody();
+    $values = [
+        "username" => $rq->username,
+        "firstname" => $rq->firstname,
+        "lastname" => $rq->lastname,
+        "usertype" => $rq->usertype,
+        "password" => password_hash($rq->password,PASSWORD_BCRYPT)
+    ];
+    if(!$db->insert("users",$values))
+        error($db->getError());
+    response("New User added!");
+}
 
-//Submits a get request to api/getAllUsers
-to("api/getAllUsers");
+function delete(){
+    if(!defined('URI_PARAM'))
+        error("Invalid Request! Please specify user id");
+    $db = new DAL();
+    $id = URI_PARAM;
+    if(!$db->delete("users","id=:id",["id" => $id]))
+        error($db->getError());
+    response("User Deleted Successfuly!");
+}
+
+function patch(){
+    if(!defined('URI_PARAM'))
+        error("Invalid Request! Please specify user id");
+    $db = new DAL();
+    $id = URI_PARAM;
+    $rq = (object)getRequestBody();
+    $values = [
+        "firstname" => $rq->firstname,
+        "lastname" => $rq->lastname];
+    $params = ["id" => $id];
+
+    $db = new DAL();
+
+    if(!$db->update("users","id=:id",$values,$params))
+        error($db->getError());
+    response("User Updated Successfuly");
+}
+
+//EOF
+
 ```
-the route for this will be http://localhost/phpeasy/api/addUser
-
-API implementation in PHPEasy promotes using guard clauses for more readable and shorter code.
 
 ## 3. API Functions
 APIs in PHPEasy encourages a procedural coding style, 
 
 so here are the list of functions that you can use in API implementations:
 
-## 3.1 get()
-Declare a php file as HTTP GET endpoint.
-- Can't be accessed through Sec-Fetch-Mode('navigate')
-- Place it at the top of php file.
+## 3.3 startAPI
+Initialize a PHP file as a REST API.
+
+After calling this function you can implement http verbs as function.
 
 Example:
 ```php
 <?php
-get();
+use function Core\Helper\startAPI;
+
+startAPI();
+
+function get(){
+    //Handle GET request to api/users
+}
 ```
 
-## 3.2 post()
-Declare a php file as HTTP POST endpoint.
-- Can't be accessed through Sec-Fetch-Mode('navigate')
-- Place it at the top of php file.
+Error response will be received if you try to request using http methods other than GET.
+
+## 3.4 getRequestBody
+Get request body and convert it into assoc array.
 
 Example:
+
 ```php
 <?php
-post();
-```
+use Core\Helper\getRequestBody;
 
-## 3.3 validate($inputs,$validations)
+$rq = getRequestBody();
+$username = $rq["username"];
+$password = $rq["password"];
+//you can convert it to object for easy access
+//$rq = (object)$rq;
+//$username = $rq->username;
+//$password = $rq->password;
+```
+## 3.5 validate($inputs,$validations)
 Validate a key-value pair array based on validation rules.
-- Returns true if valid, Echo errors if invalid and exits the script.
+- Return true if valid, exit and return 400 status code and error details if not.
 - Use it to validate request data ($_GET,$_POST).
 - `$inputs` - Associative array to be validated.
 - `$validations` - Associative array containing keys that matched keys in $data and values are the validation rules.
 
 Example:
 
-api/addUser.php
 ```php
 <?php
-post();
-//Form data from View/admin.php
+use function Core\Helper\getRequestBody;
+use function Core\Validator\validate;
+
+$rq = getRequestBody();
 $dataRules = ["uname" => "required|string",
     "upass" => "required|string",
     "firstName" => "required|string",
     "lastName" => "required|string"];
-validate($_POST,$dataRules);
+validate($rq,$dataRules);
 ```
 
-## 3.4 allowedVars($inputs,$rules)
-Filter an associative array based on $rules(same as $dataRules in validate()) and place it in 1 array.
-- returns - Associative Array
-- `$inputs` - Associative array to filter ($_GET/$_POST)
-- `$rules` - Associative array
+## 3.6 error(string|array $message)
+Output response with 400 status code and error message
+- `$message` - String|Array Error Message
 
-## 3.5 invalid($message)
-Return HTTP 403 response code, message and exits the script.
-- `$message` - String for response
+## 3.7 response(string|array $content,int $statusCode = 200,string $contentType = 'application/json')
+Set content type and status code then output content and exit script
+- `$content` string|array -  The content to output
+- `$statusCode` int - The response status code (default 200)
+- `$contentType` string - The content type (default application/json).
+ Available content-types: [ application/json | plain/text | text/html ]
 
-## 3.6 to($getEndpoint)
-Submits a GET request and echo its response
-- `$getEndpoint` - GET API endpoint
+## 3.8 to($route)
+Include specified view
+- `$route` string - View file path
 
-## 3.7 esc($string)
+Mostly used for calling SPA component
+
+## 3.9 redirect($path="")
+Redirect to specified view.
+
+If path is not specified, redirect based on session.
+- `$view` string - Path to view
+
+## 3.10 esc($string)
 Shorter syntax for htmlspecialchars()
 - `$string` - String to sanitize
-- Use it for echoing HTML sanitazion.
+- Use it for HTML sanitization.
 
-## 3.8 output($content,$contentType = 'application/json')
-Set content type, output the content and exit script
-- `$content` - String to output
-- `$contentType` - Sets content-type header defaults application/json
-
-## 3.9 generateCode($length = 6)
+## 3.11 generateCode($length = 6)
 Generate a randomized alphanumeric code
 - `$length` - Length of code to be generated (default 6)
 
-## 3.10 objectToSession($object)
+## 3.12 objectToSession($object)
 Extract object keys and values and store to session array
 - `$object` - The object to extract
 Example:
 
 ```php
 <?php
-$db = new DAL();
-$user = new User($db);
+use Core\DAL;
 
-if(!$userInfo = $user->getDetails($userId))
+$db = new DAL();
+
+if(!$user = $db->getItem(1))
     invalid("User does not exist!");
 
 objToSession($userInfo);
 ```
 
-## 3.11 uploadFile($uploadFile,$uploadPath)
+## 3.13 uploadFile($uploadFile,$uploadPath)
 Generate new file name and upload the file
  - `string $uploadFile` $_FILE key
  * `string $uploadPath` Location for upload file must add "/" to the end
  * returns boolean|string New file name if successful, false otherwise
 
-## 3.12 session($sessionVar,$value = null)
+## 3.14 session($sessionVar,$value = null)
 Get/Set a session variable
 - `$sessionVar` - Session Key
 - `$value` - Sets a session value if null
 
-## 3.13 objArrayToValues($objArr,$item)
+## 3.15 objArrayToValues($objArr,$item)
 Convert an array of objects to indexed array containing values of specified item.
 - `$objArr` - Array if ibjects to convert
 - `$item` - object item to extract
-
-## 3.14 invalid($message)
-Returns a 403 HTTP response code, outputs `$message` and exit the script.
 
 ## 4. Working with database
 PHPEasy introduces DAL() class for database operations.
@@ -401,32 +436,6 @@ Get lastId inserted to database
 ## 4.12 getDriver()
 Get the database friver that is currently used.
 
-# 5. Model
-Create models inside Models folder
-
-PHPEasy utilizes dependency injection to avoid too much object creation.
-
-Models can be accessed in APIs and even on views,
-no need to declare namespaces or `use` keyword.
-
-Example:
-
- - Models/Users.php
-```php
-<?php
-class Users extends Model{
-
-    private $table = "users";
-
-    public function add($values){
-        return $this->db->insert($this->table,$values);
-    }
-
-    public function getAll(){
-        $sql = "SELECT * FROM $this->table;";
-        return $this->db->getItems($sql);
-    }
-}
 
 ```
  - api/getAllUser.php
@@ -441,6 +450,9 @@ $usersList = $users->getAll();
 You can use models or not depending on project requirements.
 
 DAL class is accessible directly in api files, you can execute a query directly on api implementation without creating a Model.
+
+## 5. Progressive
+PHPEasy is progressive, you can add Models, Services if you like, just update the composer.json file if you added other directory.
 
 ## 6. Extras
 See 

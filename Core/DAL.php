@@ -4,12 +4,14 @@ namespace Core;
 
 use PDO;
 use PDOException;
-use function Core\Helper\output;
+
+use function Core\Helper\error;
+use function Core\Helper\response;
 
 class DAL{
 
     protected $conn;
-    public $error;
+    private $error;
     
     /**
      * Connect to database
@@ -21,7 +23,7 @@ class DAL{
         $database = $db[$dbase] ?? null;
         if($database == null){
             $data = ["status"=>"Failed","message"=>"Database config [$dbase] not found"];
-            output($data);
+            response($data);
         }
         $server = $db[$dbase]["server"];
         $user = $db[$dbase]["user"];
@@ -37,6 +39,10 @@ class DAL{
             }
             if($driver=="mysql"){
                 $this->conn = new PDO("$driver:host=$server;dbname=$dbname;charset=$charset",$user,$pass,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            }
+            if($driver=="sqlite"){
+                $this->conn = new PDO("sqlite:$server",$user,$pass,
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
             }
         }catch(PDOException $e){
@@ -230,3 +236,5 @@ class DAL{
         return $this->conn->rollBack();
     } 
 }
+
+//EOF

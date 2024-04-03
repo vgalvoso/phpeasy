@@ -28,7 +28,7 @@ function init(){
         //get $path except first "/"
         $path = substr($path, 1);
         //remove string from start to second "/"
-        if(getenv('APP_ENV') == "development")
+        //if(getenv('APP_ENV') == "development")
             $path = substr($path, strpos($path, "/") + 1);
         $method = $_SERVER['REQUEST_METHOD'];
     }else{
@@ -40,39 +40,16 @@ function init(){
 }
 
 /**
- * Declare a php file as an HTTP POST endpoint
+ * Include specified view
  */
-function post(){
-    if(isset($_SESSION["in_script"]) && session("in_script")){
-        session("in_script",false);
-        return true;
+function to($route){
+    if(file_exists("View/$route.php"))
+        include "View/$route.php";
+    else if(file_exists("View/$route/index.php"))
+        include "View/$route/index.php";
+    else{
+        include("View/not_found.php");
     }
-    if(REQUEST_METHOD != "POST")
-        notFound();
-}
-
-/**
- * Declare a php file as an HTTP GET endpoint
- */
-function get(){
-    if(REQUEST_METHOD != "GET")
-        notFound();
-    if(isset($_SESSION["in_script"]) && session("in_script")){
-        session("in_script",false);
-        return true;
-    }
-}
-
-/**
- * Include specified view or api
- */
-function to($route,$in_script=true){
-    if(file_exists($route.".php"))
-        include $route.".php";
-    else
-        include $route."/index.php";
-    if($in_script)
-        session("in_script",true);
     die;
 }
 
@@ -98,6 +75,19 @@ function notFound(){
         "error" => "Resource not found!"
     ];
     response($errData,404);
+}
+
+/**
+ * Output response with 400 status code and error message
+ * @param string|array $message - Error message
+ */
+function error(string|array $message){
+    $errData = [
+        "status" => "failed",
+        "code" => 400,
+        "error" => $message
+    ];
+    response($errData,400);
 }
 
 /**
@@ -128,7 +118,7 @@ function encloseItems($arr,$char = "'"){
  *              Available content-types: [ application/json | plain/text | text/html ]
  * @return void
  */
-function response(string|array $content,int $statusCode = 200,string $contentType = 'application/json',){
+function response(string|array $content,int $statusCode = 200,string $contentType = 'application/json'){
     header("Content-Type: $contentType");
     http_response_code($statusCode);
     $data = match ($contentType) {
@@ -210,14 +200,13 @@ function session($sessionVar, $value = null){
     return $_SESSION[$sessionVar] ?? null;
 }
 
-// Converting array of objects to array of values
+/**
+ * COnvert array of objects into indexed array of values specified by object item
+ * @param array $objArr The array of objects to convert
+ * @param string $item 
+ */
 function objArrayToValues($objArr,$item){
-    $arr = [];
-        foreach($objArr as $obj){
-            $obj = (object)$obj;
-            array_push($arr, $obj->$item);
-        }
-    return $arr;
+    return array_map(fn($obj)=>((object)$obj)->$item,$objArr);
 }
 
 /**
@@ -240,7 +229,7 @@ function view(){
     $rawPath = (strpos(PATH,"?")) ? strstr(PATH, '?', true) : PATH;
     if(!file_exists("View/$rawPath.php"))
         if(!file_exists("View/$rawPath/index.php"))
-            return false;
+            to("not_found");
         else
             $rawPath .= "/index";
 
@@ -249,13 +238,12 @@ function view(){
 }
 
 /**
- * State that a php view file is an SPA component.
- * This function will prevent the view file to be accessible via url,
- * can only be accessed through ajax call
+ * State that a response is an SPA component.
+ * Prevent access through Sec-Fetch-Mode navigate.
  */
 function component(){
     if(isset($_SERVER["HTTP_SEC_FETCH_MODE"]) && ($_SERVER["HTTP_SEC_FETCH_MODE"] == "navigate"))
-        notFound();
+        to("not_found");
 }
 
 /**
@@ -301,10 +289,50 @@ function startAPI(){
  * @return array
  */
 function getRequestBody(){
-    $data = file_get_contents("php://input");
-    if(!$data = json_decode($data,true))
-        response("Invalid json data");
+    $input = file_get_contents("php://input");
+    $data = [];
+
+    switch(REQUEST_METHOD){
+        case "POST":
+            $data = $_POST;
+        break;
+        case "GET":
+            return $_GET;
+            break;
+        case "PATCH":
+        case "PUT":
+            if(!$data = json_decode($input,true))
+                response("Invalid JSON data");
+            return $data;
+            break;
+    }
+    if(empty($data))
+        if(!$data = json_decode($input,true))
+            response("Invalid JSON data");
     return $data;
+}
+
+/**
+ * Redirect to specified view. If path is not specified, redirect based on session.
+ * @param string $view Path to view
+ */
+
+function redirect($path=""){
+    if(!empty($path)){
+        header("Location: ".BASE_URL."/".$path);
+        exit;
+    }
+    if(isset($_SESSION["usertype"])){
+        if(PATH == $_SESSION["usertype"])
+            return;
+        header("Location: ".BASE_URL."/".$_SESSION["usertype"]);
+        exit;    
+    }else{
+        if(!empty(PATH)){
+            header("Location: ".BASE_URL);
+            exit;
+        }
+    }
 }
 
 //EOF

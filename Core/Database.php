@@ -15,5 +15,13 @@ $db = [
         "dbname" => "srspos",
         "driver" => "sqlsrv",
         "charset" => "utf8"
+    ],
+    "sqlite" => [
+        "server" => "path-to-database-sqlite",
+        "user" => "",
+        "pass" => "",
+        "dbname" => "srspos",
+        "driver" => "sqlite",
+        "charset" => "utf8"
     ]
 ];
