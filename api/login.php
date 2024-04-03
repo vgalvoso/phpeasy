@@ -31,7 +31,7 @@ function post(){
     $params = ["username" => $username];
     if(!$user = $db->getItem($query,$params))
         redirect("login/login_failed");
-    if(!password_verify($password,$user->password))
+    if(password_verify($password,$user->password))
         redirect("dashboard");
     
 }
